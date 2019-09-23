@@ -79,8 +79,9 @@ def update():
 
     n_years = len(data)
 
-    n_select = min(simulation_population_size_input.value,
-                   n_years - 1)  # sample size
+    if n_years < simulation_population_size_input.value:
+        simulation_population_size_input.value = n_years - 1
+
     # number of times to run the simulation
     n_simulations = simulation_number_input.value
 
@@ -92,7 +93,7 @@ def update():
     for i in range(n_simulations):
         # select random sample and recalculate the return periods based on the sub-selection
         selection, sample_mean, sample_var, sample_stdev, sample_skew = calculate_Tr(
-            data.sample(n_select, replace=False), param)
+            data.sample(simulation_population_size_input.value, replace=False), param)
         selection.sort_values(by='rank', inplace=True, ascending=False)
 
         # log-pearson distribution
@@ -130,7 +131,7 @@ def update():
     ffa_info.text = """Mean of {} simulations of a sample size {} \n
     out of a total {} years of record.  \n
     Bands indicate 1 and 2 standard deviations from the mean, respectively.""".format(
-        n_simulations, n_select, n_years)
+        n_simulations, simulation_population_size_input.value, n_years)
 
 
 def update_station(attr, old, new):
