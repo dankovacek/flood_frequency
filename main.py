@@ -10,7 +10,7 @@ import scipy.stats as st
 from bokeh.layouts import row, column
 from bokeh.models import CustomJS, Slider, Band, Spinner
 from bokeh.plotting import figure, curdoc, ColumnDataSource
-from bokeh.models.widgets import AutocompleteInput
+from bokeh.models.widgets import AutocompleteInput, Div
 
 from get_station_data import get_daily_UR, get_annual_inst_peaks
 
@@ -77,17 +77,19 @@ def update():
 
     param = 'PEAK'
 
+    n_years = len(data)
+
     n_select = min(simulation_population_size_input.value,
-                   len(data) - 1)  # sample size
+                   n_years - 1)  # sample size
     # number of times to run the simulation
-    n_iterations = simulation_number_input.value
+    n_simulations = simulation_number_input.value
 
     # create a dataframe to track results for each simulation
     all_models = pd.DataFrame()
     all_models['Tr'] = np.linspace(1.01, 200, 500)
     all_models.set_index('Tr', inplace=True)
 
-    for i in range(n_iterations):
+    for i in range(n_simulations):
         # select random sample and recalculate the return periods based on the sub-selection
         selection, sample_mean, sample_var, sample_stdev, sample_skew = calculate_Tr(
             data.sample(n_select, replace=False), param)
@@ -125,6 +127,10 @@ def update():
                   'lp3_model': lp3_model,
                   }
     distribution_source.data = simulation
+    ffa_info.text = """Mean of {} simulations of a sample size {} \n
+    out of a total {} years of record.  \n
+    Bands indicate 1 and 2 standard deviations from the mean, respectively.""".format(
+        n_simulations, n_select, n_years)
 
 
 def update_station(attr, old, new):
@@ -156,6 +162,9 @@ simulation_number_input = Spinner(
 simulation_population_size_input = Spinner(
     high=200, low=2, step=1, value=10, title="Sample Size for Simulations"
 )
+
+ffa_info = Div(
+    text="Mean of {} simulations of a sample size {}.".format('x', 'y'))
 
 # callback for updating the plot based on a change to the input station
 station_name_input.on_change('value', update_station)
@@ -212,6 +221,7 @@ ffa_plot.legend.click_policy = "hide"
 layout = column(station_name_input,
                 simulation_population_size_input,
                 simulation_number_input,
+                ffa_info,
                 ffa_plot)
 
 curdoc().add_root(layout)
