@@ -16,11 +16,14 @@ Assuming the set of annual instantaneous floods is comprised of statistically in
 
 Taking the results of each of the M simulations of N samples of the population, the mean and standard deviation of all of the distribution fits are calculated for a 'continuous' range of return periods from 1.01 to 200 years.  The shaded blue region represents 1 standard deviation from the mean, while the green region represents 2 standard deviations from the mean.
 
+The interpretation of the blue and green regions is something like, *If I had a limited record of N years upon which to base a flood estimate, I can expect the mean of the distribution for some longer period to be within the illustrated range of uncertainty, given the data.*
+
 Thoughts:
 * practically speaking, in designing a structure, we choose some design life
   * can we work backwards and find an expected design life or uncertainty given the length of dataset upon which a distribution is built?
 * how do distributions change over time as data are added?
   * can we make some comparison between the length of record we have to work with and either some desired design life or some observation about how the appropriateness of the estimate changes over time?
+* Can we make some generalization about the ratio of the subset length to the total data length, where the subset length is related to the record length we have, while the design life is related to the total data length?
 
 
 ## Getting Started
