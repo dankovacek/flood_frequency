@@ -8,7 +8,7 @@ An interactive application to explore the concept of uncertainty in flood estima
 
 Flood Frequency Analysis (FFA) is common practice for hydrologists to estimate flood magnitude.  A typical method of estimating a return period flood uses the annual peak  instantaneous flow series as an input, fitting a statistical distribution to the data (typically GEV, LPIII, etc.) and then extrapolating beyond the data, where there is considerable uncertainty.
 
-A dataset of sufficient length to capture the true distribution of annual  floods does not exist.  As a result, practitioners as a rule use limited sample sizes to work with.  The samples are then invariably sensitive to sampling variability.  Further, the fragile assumption of non-stationarity founds the basic FFA methodology on soggy ground (nice).
+A dataset of sufficient length to capture the true distribution of annual  floods does not exist.  As a result, practitioners as a rule use limited sample sizes to work with.  The samples are then sensitive to sampling variability.  Further, the fragile assumption of non-stationarity founds the basic FFA methodology on soggy ground (nice).
 
 Fitting a Log-Pearson type 3 distribution to the full set of annual maximum peak instantaneous flow events, we get some continuous estimate of the underlying distribution (solid red line).
 
