@@ -6,13 +6,15 @@ An interactive application to explore the concept of uncertainty in flood estima
 
 ## Description
 
-Estimating flood magnitude is common practice for hydrologists.  A typical method of estimating a return period flood uses the annual peak  instantaneous flow series as an input, fitting a statistical distribution to the data (typically GEV, LPIII, etc.) and then extrapolating beyond the data, where there is considerable uncertainty.
+Flood Frequency Analysis (FFA) is common practice for hydrologists to estimate flood magnitude.  A typical method of estimating a return period flood uses the annual peak  instantaneous flow series as an input, fitting a statistical distribution to the data (typically GEV, LPIII, etc.) and then extrapolating beyond the data, where there is considerable uncertainty.
 
-A dataset of sufficient length to capture the true distribution of annual  floods, and as such, practitioners often have very limited sample sizes to work with.  The samples are the invariably sensitive to sample variability.  Further, the fragile assumption of non-stationarity founds the methodology on soggy ground (nice).
+A dataset of sufficient length to capture the true distribution of annual  floods does not exist.  As a result, practitioners as a rule use limited sample sizes to work with.  The samples are then invariably sensitive to sampling variability.  Further, the fragile assumption of non-stationarity founds the basic FFA methodology on soggy ground (nice).
 
-If we assume the set of annual instantaneous floods is comprised of statistically independent events, then we can select a subset of size N of events from the total record at random.  Fitting a Log-Pearson type 3 distribution to the subset, we get some continuous estimate of the distribution.  The smaller the subset, the poorer we expect the subset to reflect reality.  Again, because the individual events are assumed to be statistically independent, we then run the simulation M times.
+Fitting a Log-Pearson type 3 distribution to the full set of annual maximum peak instantaneous flow events, we get some continuous estimate of the underlying distribution (solid red line).
 
-Taking the results of each of the M simulations of N samples of the population, we then calculate the mean and standard deviation of all of the distribution fits.  The shaded blue region represents 1 standard deviation from the mean, while the green region represents 2 standard deviations from the mean.
+Assuming the set of annual instantaneous floods is comprised of statistically independent events, we can select a subset of size N (without replacement) of events from the total record at random.  Fitting a Log-Pearson type 3 distribution to the subset, we get some other continuous estimate of the distribution.  The smaller the subset, the poorer we expect the subset to reflect reality.  Again, because the individual events are assumed to be statistically independent, we then run the simulation M times.
+
+Taking the results of each of the M simulations of N samples of the population, the mean and standard deviation of all of the distribution fits are calculated for a 'continuous' range of return periods from 1.01 to 200 years.  The shaded blue region represents 1 standard deviation from the mean, while the green region represents 2 standard deviations from the mean.
 
 Thoughts:
 * practically speaking, in designing a structure, we choose some design life
