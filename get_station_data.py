@@ -123,7 +123,7 @@ def get_peak_inst_flows_by_station_ID(conn, station):
 
     # df = pd.read_sql_table(rows, columns=column_headers)table_name='ANNUAL_INSTANT_PEAKS', columns=''
     df = pd.read_sql_query(query, con=conn, params=(station, 'Q', 'H'))
-    print(df.head())
+
     return df
 
 
