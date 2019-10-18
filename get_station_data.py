@@ -15,7 +15,7 @@ import scipy.spatial
 from stations import IDS_AND_DAS, STATIONS_DF
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-#DATA_DIR = os.path.join(BASE_DIR, 'data/')
+# DATA_DIR = os.path.join(BASE_DIR, 'data/')
 DB_DIR = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), 'hydat_db/')
 
 
@@ -93,11 +93,6 @@ def get_data_type(label, table_name, var_name):
 def get_annual_inst_peaks(station):
     time0 = time.time()
     # create a database connection
-    cols = ['STATION_NUMBER', 'YEAR', 'MONTH', 'NO_DAYS']
-
-    cols += day_labels.keys()
-
-    columns = ['YEAR', 'MONTH', 'NO_DAYS']
     conn = create_connection(os.path.join(DB_DIR, 'Hydat.sqlite3'))
 
     with conn:
@@ -118,16 +113,17 @@ def get_peak_inst_flows_by_station_ID(conn, station):
     need to figure out how to access this info.)
     """
     time0 = time.time()
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT * FROM ANNUAL_INSTANT_PEAKS WHERE STATION_NUMBER=? AND DATA_TYPE=? AND PEAK_CODE=?", (station, 'Q', 'H'))
+    # cur = conn.cursor()
+    query = "SELECT * FROM ANNUAL_INSTANT_PEAKS WHERE STATION_NUMBER=? AND DATA_TYPE=? AND PEAK_CODE=?"
 
-    rows = cur.fetchall()
+    # rows = cur.fetchall()
 
-    column_headers = [description[0] for description in cur.description]
-    id_var_headers = column_headers[:11]
+    # column_headers = [description[0] for description in cur.description]
+    # id_var_headers = column_headers[:11]
 
-    df = pd.DataFrame(rows, columns=column_headers)
+    # df = pd.read_sql_table(rows, columns=column_headers)table_name='ANNUAL_INSTANT_PEAKS', columns=''
+    df = pd.read_sql_query(query, con=conn, params=(station, 'Q', 'H'))
+    print(df.head())
     return df
 
 

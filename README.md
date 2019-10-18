@@ -2,7 +2,7 @@
 
 An interactive application to explore the concept of uncertainty in flood estimation.
 
-![](img/app_screenshot.png)
+![](img/screencap.png)
 
 ## Description
 
@@ -19,12 +19,13 @@ Taking the results of each of the M simulations of N samples of the population, 
 The interpretation of the blue and green regions is something like, *If I had a limited record of N years upon which to base a flood estimate, I can expect the mean of the distribution for some longer period to be within the illustrated range of uncertainty, given the data.*
 
 Thoughts:
-* practically speaking, in designing a structure, we choose some design life
-  * can we work backwards and find an expected design life or uncertainty given the length of dataset upon which a distribution is built?
-* how do distributions change over time as data are added?
-  * can we make some comparison between the length of record we have to work with and either some desired design life or some observation about how the appropriateness of the estimate changes over time?
-* Can we make some generalization about the ratio of the subset length to the total data length, where the subset length is related to the record length we have, while the design life is related to the total data length?
 
+*  practically speaking, in designing a structure, we choose some design life
+  * can we work backwards and find an expected design life or uncertainty given the length of dataset upon which a distribution is built?
+*  how do distributions change over time as data are added?
+  * can we make some comparison between the length of record we have to work with and either some desired design life or some observation about how the appropriateness of the estimate changes over time?
+*  Can we make some generalization about the ratio of the subset length to the total data length, where the subset length is related to the record length we have, while the design life is related to the total data length?
+*  **I could also make it so that the selection of a subset can be done interactively with a box select or lasso tool?**
 
 ## Getting Started
 
