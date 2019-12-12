@@ -2,7 +2,7 @@
 
 An interactive application to explore the concept of uncertainty in flood estimation.
 
-![](img/screencap.png)
+![Screen Capture of basic UI](img/screencap.png)
 
 ## Description
 
@@ -22,12 +22,12 @@ The interpretation of the blue and green regions is something like, *If I had a 
 
 ## Further Thoughts
 
-*  practically speaking, in designing a structure, we choose some design life
+* practically speaking, in designing a structure, we choose some design life
   * can we work backwards and find an expected design life or uncertainty given the length of dataset upon which a distribution is built?
-*  how do distributions change over time as data are added?
+* how do distributions change over time as data are added?
   * can we make some comparison between the length of record we have to work with and either some desired design life or some observation about how the appropriateness of the estimate changes over time?
-*  Can we make some generalization about the ratio of the subset length to the total data length, where the subset length is related to the record length we have, while the design life is related to the total data length?
-*  **I could also make it so that the selection of a subset can be done interactively with a box select or lasso tool?**
+* Can we make some generalization about the ratio of the subset length to the total data length, where the subset length is related to the record length we have, while the design life is related to the total data length?
+* **I could also make it so that the selection of a subset can be done interactively with a box select or lasso tool?**
 
 ## Getting Started
 
@@ -36,6 +36,7 @@ The interpretation of the blue and green regions is something like, *If I had a 
 This application is developed on Ubuntu 18.
 
 Package requirements include:
+
 * numpy
 * pandas
 * scipy
@@ -66,16 +67,12 @@ Package requirements include:
 Note the address that the local Bokeh server launches, indicated in the terminal.
 
 Typically, the address is:
-```
-http://localhost:5006/flood_freq
-```
+
+>`http://localhost:5006/flood_freq`
 
 ## Help
 
-Any advise for common problems or issues.
-```
-command to run if program contains helper info
-```
+You're on your own for now...
 
 ## Authors
 
@@ -84,7 +81,7 @@ Dan Kovacek, P.Eng. [@postnostills](https://twitter.com/postnostills)
 ## Version History
 
 * 0.1
-    * Initial Release
+  * Initial Release
 
 ## License
 
@@ -93,4 +90,5 @@ This project is licensed under the MIT License - see the LICENSE.md file for det
 ## Acknowledgments
 
 The Bokeh visualization library:
+
 * [Bokeh](https://https://bokeh.org/)

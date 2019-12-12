@@ -74,7 +74,7 @@ def update_UI_text_output(n_simulations, n_years):
     ffa_info.text = """Mean of {} simulations of a sample size {} \n
     out of a total {} years of record.  \n
     Bands indicate 1 and 2 standard deviations from the mean, respectively.""".format(
-        n_simulations, simulation_population_size_input.value, n_years)
+        n_simulations, .value, n_years)
 
     error_info.text = ""
 
@@ -92,7 +92,7 @@ def run_ffa_simulation(data, target_param, n_simulations):
     for i in range(n_simulations):
 
         sample_set = data.sample(
-            simulation_population_size_input.value, replace=False)
+            .value, replace=False)
 
         selection = calculate_Tr(sample_set, target_param)
 
@@ -130,8 +130,8 @@ def update():
 
     n_years = len(data)
 
-    if n_years < simulation_population_size_input.value:
-        simulation_population_size_input.value = n_years - 1
+    if n_years < .value:
+        .value = n_years - 1
 
 
     # Run the FFA fit simulation on a sample of specified size
@@ -164,7 +164,7 @@ def update():
 
     data['empirical_cdf'] = data['rank'] / (len(data) + 1)
 
-    pearson_fit_params = st.pearson3.fit(np.log(data['PEAK']))
+    # pearson_fit_params = st.pearson3.fit(np.log(data['PEAK']))
 
     # reverse the order for proper plotting on P-P plot
     data['theoretical_cdf'] = st.pearson3.cdf(z_empirical, skew=log_skew)[::-1]
@@ -200,6 +200,9 @@ def update_station(attr, old, new):
 
 
 def update_num_simulations(attr, old, new):
+    if new > 500:
+        simulation_size_input.value = 500
+        error_info.text = "Max simulation size is 500."
     update()
 
 
@@ -223,7 +226,7 @@ simulation_number_input = Spinner(
     high=200, low=1, step=1, value=50, title="Number of Simulations",
 )
 
-simulation_population_size_input = Spinner(
+ = Spinner(
     high=200, low=2, step=1, value=10, title="Sample Size for Simulations"
 )
 
@@ -235,7 +238,7 @@ error_info = Div(text="", style={'color': 'red'})
 # callback for updating the plot based on a change to the input station
 station_name_input.on_change('value', update_station)
 simulation_number_input.on_change('value', update_num_simulations)
-simulation_population_size_input.on_change(
+.on_change(
     'value', update_simulation_sample_size)
 
 update()
@@ -337,7 +340,7 @@ pp_plot.legend.location = 'top_left'
 
 # format the figure
 layout = column(station_name_input,
-                simulation_population_size_input,
+                ,
                 simulation_number_input,
                 ffa_info,
                 error_info,
