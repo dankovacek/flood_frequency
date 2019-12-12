@@ -70,13 +70,53 @@ def norm_ppf(x):
     return st.norm.ppf(1-(1/x))
 
 
+def update_UI_text_output(n_simulations, n_years):
+    ffa_info.text = """Mean of {} simulations of a sample size {} \n
+    out of a total {} years of record.  \n
+    Bands indicate 1 and 2 standard deviations from the mean, respectively.""".format(
+        n_simulations, simulation_population_size_input.value, n_years)
+
+    error_info.text = ""
+
+
+def run_ffa_simulation(data, target_param, n_simulations):
+    # reference:
+    # https://nbviewer.jupyter.org/github/demotu/BMC/blob/master/notebooks/CurveFitting.ipynb
+
+    model = pd.DataFrame()
+    model['Tr'] = np.linspace(1.01, 200, 500)
+    model.set_index('Tr', inplace=True)
+
+    model['z'] = list(map(norm_ppf, model.index.values))
+
+    for i in range(n_simulations):
+
+        sample_set = data.sample(
+            simulation_population_size_input.value, replace=False)
+
+        selection = calculate_Tr(sample_set, target_param)
+
+        # log-pearson distribution
+        log_skew = st.skew(np.log10(selection[target_param]))
+
+        lp3 = 2 / log_skew * \
+            (np.power((model['z'] - log_skew / 6) * log_skew / 6 + 1, 3) - 1)
+
+        lp3_model = np.power(10, np.mean(
+            np.log10(selection[target_param])) + lp3 * np.std(np.log10(selection[target_param])))
+
+        model[i] = lp3_model.values
+    return model
+
+
 def update():
     station_name = station_name_input.value.split(':')[-1].strip()
     df = get_annual_inst_peaks(
         NAMES_TO_IDS[station_name])
-    # df['DateTime'] = pd.to_datetime(
-    #     (df.YEAR*10000+df.MONTH*100+df.DAY).apply(str), format='%Y-%m-%d')
-    # df.set_index('DateTime', inplace=True)
+
+    # set the target param to PEAK to extract peak annual values 
+    target_param = 'PEAK'
+
     if len(df) < 2:
         error_info.text = "Error, insufficient data in record (n = {}).  Resetting to default.".format(
             len(df))
@@ -88,65 +128,26 @@ def update():
 
     data['Mean'] = np.mean(data['PEAK'])
 
-    # reference:
-    # https://nbviewer.jupyter.org/github/demotu/BMC/blob/master/notebooks/CurveFitting.ipynb
-
-    param = 'PEAK'
     n_years = len(data)
 
     if n_years < simulation_population_size_input.value:
         simulation_population_size_input.value = n_years - 1
 
-    # number of times to run the simulation
+
+    # Run the FFA fit simulation on a sample of specified size
+    ## number of times to run the simulation
     n_simulations = simulation_number_input.value
-    model = pd.DataFrame()
-    model['Tr'] = np.linspace(1.01, 200, 500)
-    model.set_index('Tr', inplace=True)
-
-    model['z'] = list(map(norm_ppf, model.index.values))
-
     time0 = time.time()
-
-    for i in range(n_simulations):
-
-        ####
-
-        # Add in a QQ plot.
-        # need to keep track of the sample parameters,
-        # in order to calculate a mean and use
-        # to derive the theoretical quantiles
-        # for plotting against the empirical ones
-
-        ####
-
-        sample_set = data.sample(
-            simulation_population_size_input.value, replace=False)
-
-        selection = calculate_Tr(sample_set, param)
-
-        # log-pearson distribution
-        log_skew = st.skew(np.log10(selection[param]))
-
-        lp3 = 2 / log_skew * \
-            (np.power((model['z'] - log_skew / 6) * log_skew / 6 + 1, 3) - 1)
-
-        lp3_model = np.power(10, np.mean(
-            np.log10(selection[param])) + lp3 * np.std(np.log10(selection[param])))
-
-        model[i] = lp3_model.values
-
+    model = run_ffa_simulation(data, target_param, n_simulations)
     time_end = time.time()
     print("Time for {:.0f} simulations = {:0.2f} s".format(
         n_simulations, time_end - time0))
 
     # plot the log-pearson fit to the entire dataset
-    # log-pearson distribution
-    log_skew = st.skew(np.log10(data[param]))
+    log_skew = st.skew(np.log10(data[target_param]))
     # print(model.index.values)
     z_model = np.array(list(map(norm_ppf, model.index.values)))
     z_empirical = np.array(list(map(norm_ppf, data['Tr'])))
-
-    # print(model.head())
 
     lp3_model = 2 / log_skew * \
         (np.power((z_model - log_skew / 6) * log_skew / 6 + 1, 3) - 1)
@@ -154,16 +155,16 @@ def update():
         (np.power((z_empirical - log_skew/6)*log_skew/6 + 1, 3)-1)
 
     lp3_quantiles_model = np.power(10, np.mean(
-        np.log10(data[param])) + lp3_model*np.std(np.log10(data[param])))
+        np.log10(data[target_param])) + lp3_model*np.std(np.log10(data[target_param])))
 
     lp3_quantiles_empirical = np.power(10, np.mean(
-        np.log10(data[param])) + lp3_empirical*np.std(np.log10(data[param])))
+        np.log10(data[target_param])) + lp3_empirical*np.std(np.log10(data[target_param])))
 
     data['theoretical'] = lp3_quantiles_empirical
 
     data['empirical_cdf'] = data['rank'] / (len(data) + 1)
 
-    params = st.pearson3.fit(np.log(data['PEAK']))
+    pearson_fit_params = st.pearson3.fit(np.log(data['PEAK']))
 
     # reverse the order for proper plotting on P-P plot
     data['theoretical_cdf'] = st.pearson3.cdf(z_empirical, skew=log_skew)[::-1]
@@ -186,13 +187,12 @@ def update():
                   'lp3_model': lp3_quantiles_model
                   }
 
-    distribution_source.data = simulation
-    ffa_info.text = """Mean of {} simulations of a sample size {} \n
-    out of a total {} years of record.  \n
-    Bands indicate 1 and 2 standard deviations from the mean, respectively.""".format(
-        n_simulations, simulation_population_size_input.value, n_years)
 
-    error_info.text = ""
+    
+
+    distribution_source.data = simulation
+    
+    update_UI_text_output(n_years, n_simulations)
 
 
 def update_station(attr, old, new):
@@ -245,7 +245,8 @@ ts_plot = figure(title="Annual Maximum Flood",
                  #   x_range=(0.9, 2E2),
                  #   x_axis_type='log',
                  width=800,
-                 height=250)
+                 height=250,
+                 output_backend="webgl")
 
 ts_plot.xaxis.axis_label = "Year"
 ts_plot.yaxis.axis_label = "Flow (m³/s)"
@@ -264,7 +265,8 @@ ffa_plot = figure(title="Flood Frequency Analysis Explorer",
                   x_range=(0.9, 2E2),
                   x_axis_type='log',
                   width=800,
-                  height=500)
+                  height=500,
+                  output_backend="webgl")
 
 ffa_plot.xaxis.axis_label = "Return Period (Years)"
 ffa_plot.yaxis.axis_label = "Flow (m³/s)"
@@ -297,7 +299,8 @@ ffa_plot.legend.click_policy = "hide"
 # prepare a Q-Q plot
 qq_plot = figure(title="Q-Q Plot",
                  width=400,
-                 height=300)
+                 height=300,
+                 output_backend="webgl")
 
 qq_plot.xaxis.axis_label = "Empirical"
 qq_plot.yaxis.axis_label = "Theoretical"
@@ -311,7 +314,8 @@ qq_plot.legend.location = 'top_left'
 # prepare a P-P plot
 pp_plot = figure(title="P-P Plot",
                  width=400,
-                 height=300)
+                 height=300,
+                 output_backend="webgl")
 
 pp_plot.xaxis.axis_label = "Empirical"
 pp_plot.yaxis.axis_label = "Theoretical"
