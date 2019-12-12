@@ -50,7 +50,7 @@ def calculate_Tr(data, param, correction_factor=None):
         correction_factor = 1
 
     data['rank'] = data[param].rank(ascending=False, method='first')
-    data.loc[:, 'logQ'] = map(math.log, data[param])
+    data.loc[:, 'logQ'] = list(map(math.log, data[param]))
 
     # mean_Q, var_Q, stdev_Q, skew_Q = get_stats(data, param)
 
@@ -103,7 +103,7 @@ def update():
     model['Tr'] = np.linspace(1.01, 200, 500)
     model.set_index('Tr', inplace=True)
 
-    model['z'] = map(norm_ppf, model.index.values)
+    model['z'] = list(map(norm_ppf, model.index.values))
 
     time0 = time.time()
 
@@ -143,8 +143,8 @@ def update():
     # log-pearson distribution
     log_skew = st.skew(np.log10(data[param]))
     # print(model.index.values)
-    z_model = np.array(map(norm_ppf, model.index.values))
-    z_empirical = np.array(map(norm_ppf, data['Tr']))
+    z_model = np.array(list(map(norm_ppf, model.index.values)))
+    z_empirical = np.array(list(map(norm_ppf, data['Tr'])))
 
     # print(model.head())
 
@@ -253,12 +253,12 @@ ts_plot = figure(title="Annual Maximum Flood",
 
 ts_plot.xaxis.axis_label = "Year"
 ts_plot.yaxis.axis_label = "Flow (m³/s)"
-ts_plot.circle('YEAR', 'PEAK', source=peak_source, legend="Measured Data")
+ts_plot.circle('YEAR', 'PEAK', source=peak_source, legend_label="Measured Data")
 ts_plot.circle('YEAR', 'PEAK', source=peak_flagged_source, color="orange",
-               legend="Measured Data (QA/QC Flag)")
+               legend_label="Measured Data (QA/QC Flag)")
 
 ts_plot.line('YEAR', 'Mean', source=peak_source, color='red',
-             legend='Mean Annual Max', line_dash='dashed')
+             legend_label='Mean Annual Max', line_dash='dashed')
 
 ts_plot.legend.location = "top_left"
 ts_plot.legend.click_policy = 'hide'
@@ -273,17 +273,17 @@ ffa_plot = figure(title="Flood Frequency Analysis Explorer",
 ffa_plot.xaxis.axis_label = "Return Period (Years)"
 ffa_plot.yaxis.axis_label = "Flow (m³/s)"
 
-ffa_plot.circle('Tr', 'PEAK', source=peak_source, legend="Measured Data")
+ffa_plot.circle('Tr', 'PEAK', source=peak_source, legend_label="Measured Data")
 ffa_plot.circle('Tr', 'PEAK', source=peak_flagged_source, color="orange",
-                legend="Measured Data (QA/QC Flag)")
+                legend_label="Measured Data (QA/QC Flag)")
 ffa_plot.line('Tr', 'lp3_model', color='red',
               source=distribution_source,
-              legend='Log-Pearson3 (All Data)')
+              legend_label='Log-Pearson3 (All Data)')
 
 ffa_plot.line('Tr', 'mean', color='navy',
               line_dash='dashed',
               source=distribution_source,
-              legend='Mean Simulation')
+              legend_label='Mean Simulation')
 
 
 # plot the error bands as shaded areas
@@ -307,7 +307,7 @@ qq_plot.xaxis.axis_label = "Empirical"
 qq_plot.yaxis.axis_label = "Theoretical"
 
 qq_plot.circle('PEAK', 'theoretical', source=peak_source)
-qq_plot.line('PEAK', 'PEAK', source=peak_source, legend='1:1',
+qq_plot.line('PEAK', 'PEAK', source=peak_source, legend_label='1:1',
              line_dash='dashed', color='green')
 
 qq_plot.legend.location = 'top_left'
@@ -321,7 +321,7 @@ pp_plot.xaxis.axis_label = "Empirical"
 pp_plot.yaxis.axis_label = "Theoretical"
 
 pp_plot.circle('empirical_cdf', 'theoretical_cdf', source=peak_source)
-pp_plot.line('empirical_cdf', 'empirical_cdf', source=peak_source, legend='1:1',
+pp_plot.line('empirical_cdf', 'empirical_cdf', source=peak_source, legend_label='1:1',
              line_dash='dashed', color='green')
 
 pp_plot.legend.location = 'top_left'
