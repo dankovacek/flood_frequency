@@ -165,12 +165,8 @@ def update():
 
     params = st.pearson3.fit(np.log(data['PEAK']))
 
-    # Separate parts of parameters
-    # arg = params[:-2]
-    # loc = params[-2]
-    # scale = params[-1]
-
-    data['theoretical_cdf'] = st.pearson3.cdf(z_empirical, skew=log_skew)
+    # reverse the order for proper plotting on P-P plot
+    data['theoretical_cdf'] = st.pearson3.cdf(z_empirical, skew=log_skew)[::-1]
 
     # update the peak flow data source
     peak_source.data = peak_source.from_df(data)
