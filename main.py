@@ -70,11 +70,11 @@ def norm_ppf(x):
     return st.norm.ppf(1-(1/x))
 
 
-def update_UI_text_output(n_simulations, n_years):
+def update_UI_text_output(n_years):
     ffa_info.text = """Mean of {} simulations of a sample size {} \n
     out of a total {} years of record.  \n
     Bands indicate 1 and 2 standard deviations from the mean, respectively.""".format(
-        n_simulations, .value, n_years)
+        simulation_number_input.value, sample_size_input.value, n_years)
 
     error_info.text = ""
 
@@ -92,7 +92,7 @@ def run_ffa_simulation(data, target_param, n_simulations):
     for i in range(n_simulations):
 
         sample_set = data.sample(
-            .value, replace=False)
+            sample_size_input.value, replace=False)
 
         selection = calculate_Tr(sample_set, target_param)
 
@@ -105,7 +105,7 @@ def run_ffa_simulation(data, target_param, n_simulations):
         lp3_model = np.power(10, np.mean(
             np.log10(selection[target_param])) + lp3 * np.std(np.log10(selection[target_param])))
 
-        model[i] = lp3_model.values
+        model[i] = lp3_model
     return model
 
 
@@ -129,14 +129,19 @@ def update():
     data['Mean'] = np.mean(data['PEAK'])
 
     n_years = len(data)
+    print('number of years of data = {}'.format(n_years))
+    print("")
 
-    if n_years < .value:
-        .value = n_years - 1
+    # prevent the sample size from exceeding the
+    # length of record
+    if n_years < sample_size_input.value:
+        sample_size_input.value = n_years - 1
 
 
     # Run the FFA fit simulation on a sample of specified size
     ## number of times to run the simulation
     n_simulations = simulation_number_input.value
+
     time0 = time.time()
     model = run_ffa_simulation(data, target_param, n_simulations)
     time_end = time.time()
@@ -145,12 +150,12 @@ def update():
 
     # plot the log-pearson fit to the entire dataset
     log_skew = st.skew(np.log10(data[target_param]))
-    # print(model.index.values)
     z_model = np.array(list(map(norm_ppf, model.index.values)))
     z_empirical = np.array(list(map(norm_ppf, data['Tr'])))
 
     lp3_model = 2 / log_skew * \
         (np.power((z_model - log_skew / 6) * log_skew / 6 + 1, 3) - 1)
+
     lp3_empirical = 2 / log_skew * \
         (np.power((z_empirical - log_skew/6)*log_skew/6 + 1, 3)-1)
 
@@ -185,32 +190,29 @@ def update():
                   'upper_2_sigma': np.add(mean_models, 2*stdev_models),
                   'mean': mean_models,
                   'lp3_model': lp3_quantiles_model
-                  }
-
-
-    
+                  }    
 
     distribution_source.data = simulation
     
-    update_UI_text_output(n_years, n_simulations)
+    update_UI_text_output(n_years)
 
 
 def update_station(attr, old, new):
     update()
 
 
-def update_num_simulations(attr, old, new):
-    if new > 500:
-        simulation_size_input.value = 500
-        error_info.text = "Max simulation size is 500."
+def update_n_simulations(attr, old, new):
+    if new > 1000:
+        simulation_number_input.value = 1000
+        error_info.text = "Max simulation size is 500"
     update()
 
 
 def update_simulation_sample_size(attr, old, new):
     update()
+
+
 # configure Bokeh Inputs, data sources, and plots
-
-
 autocomplete_station_names = list(STATIONS_DF['Station Name'])
 peak_source = ColumnDataSource(data=dict())
 peak_flagged_source = ColumnDataSource(data=dict())
@@ -223,10 +225,10 @@ station_name_input = AutocompleteInput(
     value=IDS_TO_NAMES['08MH016'], min_characters=3)
 
 simulation_number_input = Spinner(
-    high=200, low=1, step=1, value=50, title="Number of Simulations",
+    high=1000, low=1, step=1, value=50, title="Number of Simulations",
 )
 
- = Spinner(
+sample_size_input = Spinner(
     high=200, low=2, step=1, value=10, title="Sample Size for Simulations"
 )
 
@@ -235,10 +237,10 @@ ffa_info = Div(
 
 error_info = Div(text="", style={'color': 'red'})
 
-# callback for updating the plot based on a change to the input station
+# callback for updating the plot based on a changes to inputs
 station_name_input.on_change('value', update_station)
-simulation_number_input.on_change('value', update_num_simulations)
-.on_change(
+simulation_number_input.on_change('value', update_n_simulations)
+sample_size_input.on_change(
     'value', update_simulation_sample_size)
 
 update()
@@ -289,9 +291,11 @@ ffa_plot.line('Tr', 'mean', color='navy',
 
 # plot the error bands as shaded areas
 ffa_2_sigma_band = Band(base='Tr', lower='lower_2_sigma', upper='upper_2_sigma', level='underlay',
-                        fill_alpha=0.25, fill_color='#1c9099', source=distribution_source)
+                        fill_alpha=0.25, fill_color='#1c9099',
+                        source=distribution_source)
 ffa_1_sigma_band = Band(base='Tr', lower='lower_1_sigma', upper='upper_1_sigma', level='underlay',
-                        fill_alpha=0.65, fill_color='#a6bddb', source=distribution_source)
+                        fill_alpha=0.65, fill_color='#a6bddb', 
+                        source=distribution_source)
 
 ffa_plot.add_layout(ffa_2_sigma_band)
 ffa_plot.add_layout(ffa_1_sigma_band)
@@ -329,18 +333,9 @@ pp_plot.line('empirical_cdf', 'empirical_cdf', source=peak_source, legend_label=
 
 pp_plot.legend.location = 'top_left'
 
-# ax.plot(all_models.index, all_models['mean'], color='blue', linestyle='dashed',
-#         label='Mean for n= {} and {} simulations'.format(n_select, n_iterations))
-
-# ax.fill_between(all_models.index, all_models['mean'] - all_models['stdev'], all_models['mean'] + all_models['stdev'],
-#                 alpha=0.2, label='1 sigma', color='green')
-# ax.fill_between(all_models.index, all_models['mean'] - 2*all_models['stdev'], all_models['mean'] + 2*all_models['stdev'],
-#                 alpha=0.2, label='2 sigma', color='blue')
-
-
-# format the figure
+# create a page layout
 layout = column(station_name_input,
-                ,
+                sample_size_input,
                 simulation_number_input,
                 ffa_info,
                 error_info,
