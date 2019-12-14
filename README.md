@@ -41,6 +41,8 @@ Package requirements include:
 * pandas
 * scipy
 * [Bokeh](https://bokeh.pydata.org/en/latest/index.html)
+* requests
+* wget
 
 ### Installing
 
