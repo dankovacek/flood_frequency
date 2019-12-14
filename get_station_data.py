@@ -15,9 +15,12 @@ import scipy.spatial
 from stations import IDS_AND_DAS, STATIONS_DF
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# DATA_DIR = os.path.join(BASE_DIR, 'data/')
+# This BASE_DIR is for my personal system, where the DB
+# is saved two levels up in the file directory
 DB_DIR = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), 'hydat_db/')
-
+# If you used the Download.py function to obtain the Hydat database file and docs,
+# the line below should be used to define the DB directory instead of the one above
+# DB_DIR = os.path.join(BASE_DIR, 'hydat_db/')
 
 day_labels = {}
 flag_labels = {}
@@ -38,20 +41,35 @@ def melt_(df):
     return df.reset_index().melt(id_vars=id_vars).set_index(id_vars)
 
 
-def create_connection(db_file):
+def create_connection():
     """ create a database connection to the SQLite database
         specified by the db_file
     :param db_file: database file
     :return: Connection object or None
     """
+    db_filename = get_newest_db_file([f for f in os.listdir(DB_DIR) if '.sqlite3' in f])
+    
+    print(db_filename)
     try:
-        conn = sqlite3.connect(db_file)
+        conn = sqlite3.connect(db_filename)
         return conn
     except sqlite3.Error as e:
         logging.warn('Sqlite3 connection Error: {}'.format(e))
         print(e)
-
     return None
+
+def get_newest_db_file(files):
+    if len(files) == 0:
+        print('No database file found.  Check the database path.')
+        newest_file = None
+    elif len(files) == 1:
+        print('1 file found')
+        newest_file = files[0]
+    else:
+        # sort the list in ascending order and return
+        # the last entry (latest date)
+        newest_file = sorted(files)[-1]
+    return DB_DIR + '/' + newest_file
 
 
 def get_daily_UR(station):
@@ -61,8 +79,9 @@ def get_daily_UR(station):
 
     cols += day_labels.keys()
 
-    columns = ['YEAR', 'MONTH', 'NO_DAYS']
-    conn = create_connection(os.path.join(DB_DIR, 'Hydat.sqlite3'))
+    # columns = ['YEAR', 'MONTH', 'NO_DAYS']
+
+    conn = create_connection()
 
     with conn:
         return select_dly_flows_by_station_ID(conn, station)
@@ -71,17 +90,14 @@ def get_daily_UR(station):
 
 
 def get_data_type(label, table_name, var_name):
-    conn = create_connection(os.path.join(DB_DIR, 'Hydat.sqlite3'))
-
+    conn = create_connection()
     with conn:
         cur = conn.cursor()
         cur.execute(
             "SELECT * FROM {}".format(table_name), ())
-
         rows = cur.fetchall()
-
         column_headers = [description[0] for description in cur.description]
-        id_var_headers = column_headers[:11]
+        # id_var_headers = column_headers[:11]
 
         df = pd.DataFrame(rows, columns=column_headers)
 
@@ -91,13 +107,10 @@ def get_data_type(label, table_name, var_name):
 
 
 def get_annual_inst_peaks(station):
-    time0 = time.time()
     # create a database connection
-    conn = create_connection(os.path.join(DB_DIR, 'Hydat.sqlite3'))
-
+    conn = create_connection()
     with conn:
         return get_peak_inst_flows_by_station_ID(conn, station)
-
     conn.close()
 
 
@@ -113,17 +126,8 @@ def get_peak_inst_flows_by_station_ID(conn, station):
     need to figure out how to access this info.)
     """
     time0 = time.time()
-    # cur = conn.cursor()
     query = "SELECT * FROM ANNUAL_INSTANT_PEAKS WHERE STATION_NUMBER=? AND DATA_TYPE=? AND PEAK_CODE=?"
-
-    # rows = cur.fetchall()
-
-    # column_headers = [description[0] for description in cur.description]
-    # id_var_headers = column_headers[:11]
-
-    # df = pd.read_sql_table(rows, columns=column_headers)table_name='ANNUAL_INSTANT_PEAKS', columns=''
     df = pd.read_sql_query(query, con=conn, params=(station, 'Q', 'H'))
-
     return df
 
 

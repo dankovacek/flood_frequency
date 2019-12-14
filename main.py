@@ -19,24 +19,6 @@ from get_station_data import get_daily_UR, get_annual_inst_peaks
 
 from stations import IDS_AND_DAS, STATIONS_DF, IDS_TO_NAMES, NAMES_TO_IDS
 
-# Step 1: Get one (or all of interest) stations >= min_n year records (complete year)
-#         from the master station list.
-
-# min_n = 50
-
-# min_50_yr_record_stns_all = STATIONS_DF[STATIONS_DF['record_length'] >= min_n]
-
-# min_50_yr_record_stns = min_50_yr_record_stns_all[min_50_yr_record_stns_all['Province'] == 'BC']
-
-# peak_results = {}
-
-# for stn in min_50_yr_record_stns['Station Number']:
-#     flood_df = get_annual_inst_peaks(stn)
-
-#     if len(flood_df) >= 50:
-#         peak_results[stn] = flood_df
-
-
 def get_stats(data, param):
     mean = data[param].mean()
     var = np.var(data[param])
