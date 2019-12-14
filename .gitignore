@@ -6,5 +6,6 @@ env/
 .github/
 
 *.sqlite3
+*.zip
 
 *.pyc
