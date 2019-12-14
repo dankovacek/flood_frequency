@@ -62,9 +62,9 @@ def convert_coords(data):
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_DIR = os.path.join(BASE_DIR, 'hydat_db/')
+DATA_DIR = os.path.join(BASE_DIR, 'data/')
 
-stations_df = pd.read_csv(DB_DIR + 'WSC_Stations_Master.csv')
+stations_df = pd.read_csv(DATA_DIR + 'WSC_Stations_Master.csv')
 
 print(stations_df.columns.values)
 

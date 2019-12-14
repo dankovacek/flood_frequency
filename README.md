@@ -64,8 +64,9 @@ Package requirements include:
 6. Download the hydat database file from EC.
     >`python download.py`
 
-7. Check DB path in `get_station_data.py`.
-    The path to the database directory is set at the top of `get_station_data.py` where the `DB_DIR` variable is set.  If you used the `download.py` function to download the database, follow the instructions at the top of `get_station_data.py`.  Otherwise, set the database file path however you want to organize your file structure.  
+7. Check the path to the database file in `get_station_data.py`.
+
+>  The path to the database directory is set at the top of `get_station_data.py` where the `DB_DIR` variable is set.  If you used the `download.py` function to download the database, follow the instructions at the top of `get_station_data.py`.  Otherwise, set the database file path however you want to organize your file structure.  
 
 
 ### Executing program
@@ -85,7 +86,7 @@ You're on your own for now...
 
 ## Authors
 
-Dan Kovacek, P.Eng. [@postnostills](https://twitter.com/postnostills)
+[Dan Kovacek](https://github.com/dankovacek)
 
 ## Version History
 
