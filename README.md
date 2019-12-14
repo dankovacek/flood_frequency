@@ -56,8 +56,15 @@ Package requirements include:
 4. Activate the development environment
     >`source env/bin/activate`
 
-5. install the required packages (listed above)
+5. Install the required packages (listed above)
     >`pip install -r requirements.txt`
+
+6. Download the hydat database file from EC.
+    >`python download.py`
+
+7. Check DB path in `get_station_data.py`.
+    The path to the database directory is set at the top of `get_station_data.py` where the `DB_DIR` variable is set.  If you used the `download.py` function to download the database, follow the instructions at the top of `get_station_data.py`.  Otherwise, set the database file path however you want to organize your file structure.  
+
 
 ### Executing program
 
