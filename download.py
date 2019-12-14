@@ -156,31 +156,6 @@ def check_for_updated_db_file(url, hydat_file, existing_file, db_fname, pdf_file
             print('Download cancelled, please try again.')
             return False
 
-def get_latest_station_master_list(url, filename):
-    txt = input("Download the master station list?  Please respond [y/n]")
-    if txt == 'y':
-        print('Downloading and saving master station list file to {}'.format(BASE_DIR + '/hydat_db'))
-        try:
-            print('Downloading file.')
-            wget.download(url + filename, BASE_DIR + '/hydat_db')
-            print('')
-            print('{} downloaded successfully'.format(filename))
-        except Exception as e:
-            print('Download failed, read the error message and check the file location at {}'.format(url))
-            print(e)
-            return None
-    else:
-        print('The application will not work without the master station list.')
-        print('Try manually downloading the file from {}.'.format(url))
-        print('and save it to the same directory as the database file.')
-        return None
-
-
-station_list_filename = 'hydrometric_StationList.csv'
-station_list_url = 'http://dd.weather.gc.ca/hydrometric/doc/'
-
-latest_station_master = get_latest_station_master_list(station_list_url, station_list_filename)
-
 url = 'https://collaboration.cmc.ec.gc.ca/cmc/hydrometrics/www/'
 
 pdf_filenames, db_fname = get_filenames(url)
