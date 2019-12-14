@@ -58,7 +58,7 @@ Package requirements include:
 4. Activate the development environment
     >`source env/bin/activate`
 
-5. Install the required packages (listed above)
+5. Install the required packages (or use Conda and install the dependencies listed above)
     >`pip install -r requirements.txt`
 
 6. Download the hydat database file from EC.
