@@ -62,11 +62,13 @@ def convert_coords(data):
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_DIR = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), 'hydat_db/')
+DB_DIR = os.path.join(BASE_DIR, 'hydat_db/')
 
-stations_df = pd.read_csv(DB_DIR + 'WSC_Stations_Master.csv')
+stations_df = pd.read_csv(DB_DIR + 'MSC_Station_Inventory_EN.csv')
 
-stations_df.dropna(axis=0, subset=['Gross Drainage Area (km2)'], inplace=True)
+print(stations_df.columns.values)
+
+# stations_df.dropna(axis=0, subset=['Gross Drainage Area (km2)'], inplace=True)
 
 STATIONS_DF = stations_df.copy()  # convert_coords(stations_df)
 
