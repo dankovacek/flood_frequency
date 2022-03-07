@@ -128,6 +128,7 @@ def get_peak_inst_flows_by_station_ID(conn, station):
     time0 = time.time()
     query = "SELECT * FROM ANNUAL_INSTANT_PEAKS WHERE STATION_NUMBER=? AND DATA_TYPE=? AND PEAK_CODE=?"
     df = pd.read_sql_query(query, con=conn, params=(station, 'Q', 'H'))
+
     return df
 
 

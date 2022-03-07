@@ -34,16 +34,12 @@ def calculate_Tr(data, param, correction_factor=None):
     data['rank'] = data[param].rank(ascending=False, method='first')
     data.loc[:, 'logQ'] = list(map(math.log, data[param]))
 
-    # mean_Q, var_Q, stdev_Q, skew_Q = get_stats(data, param)
-
-#     print('mean: {}, var: {}, stdev: {}, skew: {}'.format(
-#         round(mean_Q, 2), round(var_Q, 2), round(stdev_Q, 2), round(skew_Q, 2)))
     data['Tr'] = (len(data) + 1) / \
         data['rank'].astype(int).round(1)
 
     data.sort_values(by='rank', inplace=True, ascending=False)
 
-    return data  # , mean_Q, var_Q, stdev_Q, skew_Q
+    return data 
 
 
 def norm_ppf(x):
@@ -66,9 +62,9 @@ def run_ffa_simulation(data, target_param, n_simulations):
     # https://nbviewer.jupyter.org/github/demotu/BMC/blob/master/notebooks/CurveFitting.ipynb
 
     model = pd.DataFrame()
-    model['Tr'] = np.linspace(1.01, 200, 500)
+    model['Tr'] = np.logspace(-2, 3, 500)
     model.set_index('Tr', inplace=True)
-
+   
     model['z'] = list(map(norm_ppf, model.index.values))
 
     for i in range(n_simulations):
@@ -95,6 +91,7 @@ def update():
     station_name = station_name_input.value.split(':')[-1].strip()
     df = get_annual_inst_peaks(
         NAMES_TO_IDS[station_name])
+
 
     # set the target param to PEAK to extract peak annual values 
     target_param = 'PEAK'
